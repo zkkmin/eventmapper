@@ -25,7 +25,7 @@ SECRET_KEY = '-8fg07tl8gahug_&1ji316jtrr&w0$46n2qzr0op$2=)c$^atx'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [u'eventmapper-zkkmin.c9users.io']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'maps'
 ]
 
 MIDDLEWARE_CLASSES = [
