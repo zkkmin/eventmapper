@@ -1,0 +1,20 @@
+{% extends 'maps/base.html' %}
+
+{% load staticfiles %}
+
+{% block content %}
+<div class="container">
+  <h1>Welcome</h1>
+  <hr/>
+  {% if request.user.is_authenticated %}
+      <span class="pull-right"><a href="{% url 'account_logout' %}">Log out</a></span>
+  {% else %}
+      <div>
+          <a class="btn btn-primary btn-lg" href="{% url 'account_login' %}">Log in</a> OR <a class="btn btn-success btn-lg" href="{% url 'account_signup' %}">Sign up</a>
+      </div>
+  {% endif %}
+  
+</div>
+
+
+{% endblock content %}

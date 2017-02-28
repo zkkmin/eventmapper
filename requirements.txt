@@ -1,5 +1,10 @@
 Django==1.10.5
 argparse==1.2.1
+django-allauth==0.30.0
 djangorestframework==3.5.4
+oauthlib==2.0.1
 psycopg2==2.6.2
+python-openid==2.2.5
+requests==2.13.0
+requests-oauthlib==0.8.0
 wsgiref==0.1.2
