@@ -1,0 +1,45 @@
+{% extends 'maps/base.html' %}
+
+{% block content %}
+
+<div class="container">
+  <h1>Login</h1>
+  <hr />
+  <form class="login" method="POST" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="id_login">E-mail:</label>
+      <input class="form-control" autofocus="autofocus" id="id_login" name="login" placeholder="E-mail address" type="email" required />
+    </div>
+    
+    <div class="form-group">
+      <label for="id_password">Password:</label>
+      <input class="form-control" id="id_password" name="password" placeholder="Password" type="password" required />
+    </div>
+    
+    <div class="checkbox">
+      <label for="id_remember">
+        <input  id="id_remember" name="remember" type="checkbox" /> Remember Me:
+      </label>
+    </div>
+    
+    <div class="form-group">
+      <a class="btn btn-link" href="/accounts/password/reset/">Forgot Password</a>
+    </div>
+    
+    {% if redirect_field_value %}
+    <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+    {% endif %}
+    
+   
+    <button class="primaryAction btn btn-primary" type="submit">Sign In</button>
+    
+  </form>
+</div>
+
+
+{% endblock content %}
+
+
+  
