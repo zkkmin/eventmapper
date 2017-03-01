@@ -8,11 +8,14 @@ from django.contrib.postgres.fields import JSONField
 class EventMap(models.Model):
     name = models.CharField(max_length=1024)
     description = models.TextField()
-    user = models.ForeignKey('auth.User', on_delete=models.CASCADE)
+    user = models.ForeignKey('auth.User', related_name='eventmaps', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         ordering = ('created',)
+        
+    def __unicode__(self):
+        return self.name
 
 
 class Layer(models.Model):

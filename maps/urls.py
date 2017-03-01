@@ -7,11 +7,11 @@ from . import views
 
 router = routers.DefaultRouter()
 router.register(r'eventmaps', views.EventMapViewSet)
-# TODO: require eventmap parameter
-router.register(r'layers', views.LayerViewSet) 
+router.register(r'layers', views.LayerViewSet)
 
 
 urlpatterns = [
         url(r'^$', TemplateView.as_view(template_name='maps/home.html')),
-        url(r'^api/', include(router.urls))
+        url(r'^api/', include(router.urls)),
+        
     ]
