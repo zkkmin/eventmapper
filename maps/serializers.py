@@ -18,7 +18,7 @@ class EventMapSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = models.EventMap
-        fields = ('name', 'description', 'user', 'created',  )
+        fields = ('name', 'description', 'user', 'created', 'pk'  )
 
         
 
