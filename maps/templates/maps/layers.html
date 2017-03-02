@@ -1,0 +1,138 @@
+{% extends 'maps/base.html' %}
+
+{% load staticfiles %}
+
+{% block stylecode %}
+<style>
+  body{
+    background-color: #f5f8fa;
+  }
+  .no-margin-bottom {
+    margin-bottom: 0px;
+  }
+  .layer-panel{
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    border-bottom-color: #dad4d4;
+  }
+  .layer-panel-selected {
+    border-left-style: solid;
+  }
+  .unchecked-font {
+    color: #c1c1c1;
+  }
+  .inherit-lineheight {
+    line-height: inherit !important;
+  }
+</style>
+{% endblock stylecode %}
+
+
+{% block content %}
+<div class="container" id="root">
+  <h1>Add Layers</h1>
+  <div>
+    <span ><a href="{% url 'account_logout' %}">Log out</a></span>
+    <span ><a href="{% url 'account_change_password' %}">Change Password</a></span>
+  </div>
+  
+  <hr/>
+  
+  <!-- Layer Modal -->
+    <div id="layerModal" class="modal fade bs-layer-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-header" style="background-color: rgb(29, 161, 242); color: white;">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="layerModelTitle">Add New Layer</h4>
+          </div>
+          <div class="modal-body">
+
+            <form>
+              <div class="form-group" v-bind:class="{ 'has-error': layerNameHasError }">
+                <label for="layerName">Layer Name: </label>
+                <input type="text" class="form-control" id="layerName" placeholder="Layer name" v-model="layer.name" aria-describedby="helpBlock">
+                <span class="help-block">${ layerNameError }</span>
+              </div>
+              <div class="form-group" v-bind:class="{ 'has-error': layerLvlHasError }">
+                <label for="level">Level:</label>
+                <input type="text" class="form-control" id="level" placeholder="Level" v-model="layer.level" aria-describedby="helpBlock">
+                <span class="help-block">${ layerLvlError }</span>
+              </div>
+
+
+            </form>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary btn-sm" v-on:click="addLayer(layer)">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  <!-- / Layer Modal -->
+  
+  
+  
+  
+  <div class="row">
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-12">
+
+          <div class="panel panel-default">
+              <div class="panel-heading" style="background-color: #1DA1F2; color: white">
+                Layers
+                <div class='pull-right' >
+                  <a href="#" style="color: white;" data-toggle="modal" data-target=".bs-layer-modal-sm">Add</a> |
+                  <a href="#" style="color: white;" >Delete</a>
+                </div>
+              </div>
+              <template v-for="(layer, layerIndex) in layers">
+                <div v-on:click="selectLayer(layerIndex)" class="panel-body layer-panel "
+                      v-bind:class="{'layer-panel-selected': (layerIndex === selectedLayer), 'unchecked-font': !layer.checked  }">
+                  <div class="checkbox">
+                    <label>
+                      <input v-on:change="checkboxChanged(layer)" type="checkbox" v-model=layer.checked> ${layer.name}
+                    </label>
+                  </div>
+
+                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !layer.checked}">
+                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in layer.features">
+                        <small>${feature.name}</small>
+                        <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex)"></span>
+                      </a>
+                  </div>
+
+                </div>
+
+              </template>
+          </div>
+
+        </div>
+      </div>
+    </div> <!-- / end col-md-3 -->
+    
+  </div> <!-- / end row -->
+  
+  
+  
+</div>
+
+{% endblock content %}
+
+{% block jsinclude %}
+  <script src="{% static 'maps/js/maplayers.js' %}"></script>
+    <script type="text/javascript">
+    /* global $ */
+    /* global maplayersApp */
+    
+    // to clear up form data after the modal is closed
+    $('#layerModal').on('hide.bs.modal', function(e) {
+      maplayersApp.clearFormData();
+    });
+    
+  </script>
+{% endblock jsinclude %}

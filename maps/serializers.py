@@ -8,7 +8,7 @@ class LayerSerializer(serializers.HyperlinkedModelSerializer):
     
     class Meta:
         model = models.Layer
-        fields = ('name', 'building_level', 'json_data', 'eventmap', )
+        fields = ('name', 'building_level', 'json_data', 'eventmap', 'pk' )
 
 
 class EventMapSerializer(serializers.HyperlinkedModelSerializer):

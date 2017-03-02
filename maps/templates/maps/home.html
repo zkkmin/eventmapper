@@ -22,7 +22,11 @@
         <ul id="" class="list-group">
           <li v-for="m in maps"  class="list-group-item">
             ${ m.name }
-            <span class="pull-right"><a href="#" @click='editMap(m.pk)'>edit</a>&nbsp;&nbsp;<a href="#" @click="deleteMap(m.pk)">delete</a></span>
+            <span class="pull-right">
+              <a href="#" @click='editMap(m.pk)'>edit</a>&nbsp;&nbsp;
+              <a href="#" @click="deleteMap(m.pk)">delete</a>&nbsp;&nbsp;
+              <a class="btn btn-primary btn-xs" role="button" v-bind:href="'/maps/' + m.pk + '/layers/'" >Add Layers</a>
+            </span>
           </li>
         </ul>
       
