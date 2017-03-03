@@ -29,7 +29,7 @@
 
 
 {% block content %}
-<div class="container" id="root">
+<div class="container-fluid" id="root">
   <h1>Add Layers</h1>
   <div>
     <span ><a href="{% url 'account_logout' %}">Log out</a></span>
@@ -87,20 +87,22 @@
                 Layers
                 <div class='pull-right' >
                   <a href="#" style="color: white;" data-toggle="modal" data-target=".bs-layer-modal-sm">Add</a> |
-                  <a href="#" style="color: white;" >Delete</a>
+                  <a href="#" style="color: white;" @click="deleteLayer">Delete</a>
                 </div>
               </div>
-              <template v-for="(layer, layerIndex) in layers">
-                <div v-on:click="selectLayer(layerIndex)" class="panel-body layer-panel "
-                      v-bind:class="{'layer-panel-selected': (layerIndex === selectedLayer), 'unchecked-font': !layer.checked  }">
+              <template v-for="(l, layerIndex) in layers" >
+                <div :key="l.pk" v-on:click="selectLayer(layerIndex)" class="panel-body layer-panel "
+                      v-bind:class="{'layer-panel-selected': (layerIndex === selectedLayer), 'unchecked-font': !l.checked  }">
                   <div class="checkbox">
                     <label>
-                      <input v-on:change="checkboxChanged(layer)" type="checkbox" v-model=layer.checked> ${layer.name}
+                      <input v-on:change="checkboxChanged(l)" 
+                              type="checkbox" 
+                              v-model="l.checked"> ${l.name}
                     </label>
                   </div>
 
-                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !layer.checked}">
-                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in layer.features">
+                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
+                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
                         <small>${feature.name}</small>
                         <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex)"></span>
                       </a>
@@ -115,6 +117,10 @@
       </div>
     </div> <!-- / end col-md-3 -->
     
+    <div class="col-md-9">
+      <div id="mapdiv" style='height: 700px;'></div>
+    </div> <!-- / end col-md-9 -->
+    
   </div> <!-- / end row -->
   
   
@@ -125,14 +131,33 @@
 
 {% block jsinclude %}
   <script src="{% static 'maps/js/maplayers.js' %}"></script>
-    <script type="text/javascript">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script type="text/javascript">
     /* global $ */
     /* global maplayersApp */
+    /* global L */
     
     // to clear up form data after the modal is closed
     $('#layerModal').on('hide.bs.modal', function(e) {
       maplayersApp.clearFormData();
     });
+    
+    // load map into #mapdiv
+    var map = L.map('mapdiv').setView([1.3384936555025502, 103.80895614624023], 12);
+
+    var basemap = L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+      detectRetina: true,
+      attribution: 'Map data © contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>',
+      maxZoom: 28,
+      minZoom: 11
+    });
+
+    var attribution = map.attributionControl;
+    attribution.setPrefix('<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/>');
+    map.setMaxBounds([[1.56073, 104.1147], [1.16, 103.502]]);
+    basemap.addTo(map);
+    
     
   </script>
 {% endblock jsinclude %}

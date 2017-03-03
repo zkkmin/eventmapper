@@ -10,6 +10,7 @@ var maplayersApp = new Vue({
     el: '#root',
     
     data: {
+        temp: false,
         layerNameHasError: false,
         layerLvlHasError: false,
         layerNameError: '',
@@ -81,7 +82,13 @@ var maplayersApp = new Vue({
             var _that = this;
             axios.get('/api/eventmaps/' + this.mapPk + '/mlayers/')
             .then(function (response){
-                _that.layers = response.data.results;
+                var results = response.data.results;
+                _that.layers = [];
+                for (var i=0; i < results.length; i++ ){
+                    results[i].checked = false;
+                    _that.layers.push(results[i]);
+                }
+                
             });
         },
         
@@ -89,7 +96,9 @@ var maplayersApp = new Vue({
             this.selectedLayer = index;
         },
         
-        checkboxChanged: function(changedLayer){},
+        checkboxChanged: function(changedLayer){
+            
+        },
         
         showDetail: function (index){},
         
@@ -118,7 +127,17 @@ var maplayersApp = new Vue({
             
         },
         
-        deleteLayer: function(){},
+        deleteLayer: function(){
+            console.log(this.selectedLayer);
+            var layerToDelete = this.layers[this.selectedLayer];
+            // need to remove features associated with it
+            var _that = this;
+            axios.delete('/api/layers/' + layerToDelete.pk ,  {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}})
+            .then(function (response){
+                _that.getlayerlist();   
+            });
+            
+        },
         
         addFeature: function(){},
         
