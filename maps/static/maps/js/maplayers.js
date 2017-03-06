@@ -180,7 +180,7 @@ var maplayersApp = new Vue({
             var layer = this.drawnLayer,
             feature = layer.feature = layer.feature || {}; // Intialize layer.feature
             feature.type = feature.type || "Feature"; // Intialize feature.type
-            feature.id = drawnItems.getLayers().length;
+            feature.id = new Date().getTime() + Math.random(); // drawnItems.getLayers().length;
             var props = feature.properties = feature.properties || {}; // Intialize feature.properties
             props.name = this.feature.name;
             props.description = this.feature.description;
@@ -223,7 +223,46 @@ var maplayersApp = new Vue({
              
         },
         
-        deleteFeature: function(layerIndex, featureIndex) {},
+        deleteFeature: function(layerIndex, featureIndex, featureId, layerId) {
+            
+            console.log(this.layers[layerIndex].features[featureIndex].properties.name);
+            
+            this.layers[layerIndex].features = this.layers[layerIndex].features.filter(function(item){
+               return item.id != featureId && item.properties.ownerLayer == layerId; 
+            });
+            
+            drawnItems.eachLayer(function(l){
+                if(l.feature.id == featureId && l.feature.properties.ownerLayer == layerId ){
+                    console.log(l);
+                    drawnItems.removeLayer(l);
+                }
+            });
+            
+            // json data update
+            // TODO: duplicated code need to refector
+            this.json_data = drawnItems.toGeoJSON();
+            console.log(this.json_data);
+            // Filter only the features of this layer
+            function belongsTo(featureVal){
+                return featureVal.properties.ownerLayer ==layerId;
+             }
+             this.json_data.features = this.json_data.features.filter(belongsTo);
+            
+            var _that = this;
+            // https://eventmapper-zkkmin.c9users.io/api/layers/12/
+            axios.patch('/api/layers/' + layerId + '/', 
+                        { json_data: this.json_data }, 
+                        {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}} 
+            )
+            .then(function(response){
+                console.log(response);
+            })
+            .catch(function(error){
+               console.log(error.data); 
+            });
+            
+            
+        },
         
         
     }, // methods

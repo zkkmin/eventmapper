@@ -132,7 +132,7 @@
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
                       <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
                         <small>${feature.properties.name}</small>
-                        <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex)"></span>
+                        <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex, feature.id, l.pk)"></span>
                       </a>
                   </div>
 
