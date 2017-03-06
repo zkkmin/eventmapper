@@ -25,6 +25,10 @@
     line-height: inherit !important;
   }
   
+  .leaflet-popup-content-wrapper{
+    border-radius: 0px !important;
+  }
+  
 </style>
 {% endblock stylecode %}
 
@@ -64,7 +68,7 @@
                   </div>
 
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
-                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
+                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features" @click="onFeatureClicked(feature)">
                         <small>${feature.properties.name}</small>
                         
                       </a>

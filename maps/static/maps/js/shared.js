@@ -34,9 +34,28 @@ var maplayersApp = new Vue({
     },
     
     methods: {
+        
+        onFeatureClicked: function(feature){
+          map.eachLayer(function(l){
+             
+             if(l.feature != undefined){
+                 //console.log(l);
+
+                 if ( l.feature.id === feature.id){
+                     l.setStyle({color: 'red', weight: '5', opacity: 0.5});
+                     l.openPopup();
+                 }
+                 else{
+                     l.setStyle({color: 'blue', weight: '2', opacity: 0.7});
+                 }
+                 
+             }
+             
+          });
+        },
+        
         checkboxChanged: function(l, event) {
-            console.log(l);
-            //console.log(event);
+            
             if (l.checked){
                 if (map.hasLayer(l.layerGroup) == false && l.layerGroup !== undefined){
                     map.addLayer(l.layerGroup);
@@ -83,7 +102,10 @@ var maplayersApp = new Vue({
                             // control.addOverlay(temp, props.name);
                             // group them as layer group
                             // drawnItems.addLayer(temp);
-                            temp.bindPopup("<b>" + props.name + "<b><br/>" + props.description);
+                            
+                            temp.setStyle({color: 'blue', weight:2, opacity:0.7});
+                           
+                            temp.bindPopup("<b>" + props.name + "</b><br/>" + props.description);
                             tempLayerGroup.addLayer(temp);
                         }); // end foreach
                         
@@ -104,9 +126,7 @@ var maplayersApp = new Vue({
         
         selectLayer: function(index, alayer){
             this.selectedLayer = index;
-            if (map.hasLayer(alayer.layerGroup)==true && alayer.layerGroup !== undefined){
-                
-            }
+            
             
         },
         

@@ -111,6 +111,8 @@ var maplayersApp = new Vue({
                             props.description = obj.properties.description;
                             props.ownerLayer = obj.properties.ownerLayer;
                             
+                            
+                            temp.setStyle({color: "blue", weight: 1, opacity: 0.7});
                             drawnItems.addLayer(temp);
                             
                         });
@@ -188,6 +190,7 @@ var maplayersApp = new Vue({
             props.name = this.feature.name;
             props.description = this.feature.description;
             props.ownerLayer = layerToEdit.pk;
+            layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
             drawnItems.addLayer(layer);
             
             console.log('add Feature');
