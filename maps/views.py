@@ -12,6 +12,16 @@ from .permissions import IsOwnerOrReadOnly
 from .models import EventMap, Layer
 
 
+class SharedMapView(TemplateView):
+    template_name='maps/shared_map.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super(SharedMapView, self).get_context_data(**kwargs)
+        map_pk = kwargs.get('map_pk', None)
+        context['mapobj'] = get_object_or_404(EventMap, pk=map_pk)
+        return context
+
+
 class MapLayersView(LoginRequiredMixin, TemplateView):
     """
     This view checks whether the map id belongs to 

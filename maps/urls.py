@@ -14,6 +14,7 @@ router.register(r'layers', views.LayerViewSet)
 urlpatterns = [
         url(r'^$', TemplateView.as_view(template_name='maps/home.html')),
         url(r'^maps/(?P<map_pk>[0-9]+)/layers/', views.MapLayersView.as_view()),
+        url(r'^shared/(?P<map_pk>[0-9]+)/', views.SharedMapView.as_view()),
         url(r'^api/', include(router.urls)),
         
     ]

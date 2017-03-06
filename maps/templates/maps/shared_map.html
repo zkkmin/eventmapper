@@ -1,0 +1,130 @@
+{% extends 'maps/base.html' %}
+
+{% load staticfiles %}
+
+{% block stylecode %}
+<style>
+  body{
+    background-color: #f5f8fa;
+  }
+  .no-margin-bottom {
+    margin-bottom: 0px;
+  }
+  .layer-panel{
+    border-bottom-style: solid;
+    border-bottom-width: thin;
+    border-bottom-color: #dad4d4;
+  }
+  .layer-panel-selected {
+    border-left-style: solid;
+  }
+  .unchecked-font {
+    color: #c1c1c1;
+  }
+  .inherit-lineheight {
+    line-height: inherit !important;
+  }
+  
+</style>
+{% endblock stylecode %}
+
+
+{% block content %}
+<div class="container-fluid" id="root">
+  <h1>{{mapobj.name}}</h1>
+  <div>
+    {{mapobj.description}}
+  </div>
+  
+  <hr/>
+  
+ 
+  <div class="row">
+    <div class="col-md-3">
+      <div class="row">
+        <div class="col-md-12">
+
+          <div class="panel panel-default">
+              <div class="panel-heading" style="background-color: #1DA1F2; color: white">
+                Layers
+                <div class='pull-right' >
+                  
+                </div>
+              </div>
+              <template v-for="(l, layerIndex) in layers" >
+                <div :key="l.pk" v-on:click="selectLayer(layerIndex, l)" class="panel-body layer-panel "
+                      v-bind:class="{'layer-panel-selected': (layerIndex === selectedLayer), 'unchecked-font': !l.checked  }">
+                  <div class="checkbox">
+                    <label>
+                      <input v-on:change="checkboxChanged(l, $event)" 
+                              type="checkbox" 
+                              v-model="l.checked"> ${l.name}
+                    </label>
+                    
+                  </div>
+
+                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
+                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
+                        <small>${feature.properties.name}</small>
+                        
+                      </a>
+                  </div>
+
+                </div>
+
+              </template>
+          </div>
+
+        </div>
+      </div>
+    </div> <!-- / end col-md-3 -->
+    
+    <div class="col-md-9">
+      <div id="mapdiv" style='height: 700px;'>
+        
+        
+      </div>
+    </div> <!-- / end col-md-9 -->
+    
+  </div> <!-- / end row -->
+  
+  
+  
+</div>
+
+{% endblock content %}
+
+{% block jsinclude %}
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.js"></script>
+  <script src="{% static 'maps/js/shared.js' %}"></script>
+  <script type="text/javascript">
+    /* global $ */
+    /* global maplayersApp */
+    /* global L */
+    
+   
+    // load map into #mapdiv
+    var map = L.map('mapdiv').setView([1.3384936555025502, 103.80895614624023], 12);
+
+    var basemap = L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+      detectRetina: true,
+      attribution: 'Map data © contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>',
+      maxZoom: 28,
+      minZoom: 11
+    });
+
+    var attribution = map.attributionControl;
+    attribution.setPrefix('<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/>');
+    map.setMaxBounds([[1.56073, 104.1147], [1.16, 103.502]]);
+    basemap.addTo(map);
+    
+    
+    
+    
+      
+    
+    
+    
+  </script>
+{% endblock jsinclude %}

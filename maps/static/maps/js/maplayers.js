@@ -90,7 +90,8 @@ var maplayersApp = new Vue({
                 
                 var results = response.data.results;
                 // console.log(results);
-                // _that.layers = [];
+                _that.layers = [];
+                drawnItems.clearLayers();
                 
                 for (var i=0; i < results.length; i++ ){
                     
@@ -147,6 +148,8 @@ var maplayersApp = new Vue({
                _that.layers.push({
                    name: response.data.name,
                    level: response.data.building_level,
+                   checked: false,
+                   features: [],
                    pk: response.data.pk
                });
                _that.clearFormData();
