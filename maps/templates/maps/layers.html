@@ -38,6 +38,34 @@
   
   <hr/>
   
+  <!-- Feature Modal -->
+    <div id="featureModal" class="modal fade bs-feature-modal-sm" tabindex="-2" role="dialog" aria-labelledby="mySmallModalLabel">
+      <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+          <div class="modal-body">
+
+            <form>
+              <div class="form-group">
+                <label for="featureName">Feature Name: </label>
+                <input type="text" class="form-control" id="featureName" placeholder="Feature Name"  v-model="feature.name">
+              </div>
+              <div class="form-group">
+                <label for="featureDesc">Description:</label>
+                <textarea class="form-control" rows="3" id="featureDesc" v-model="feature.description"></textarea>
+
+              </div>
+              <button v-on:click="addFeature" type="button" class="btn btn-primary btn-sm" data-dismiss="modal">Add</button>
+
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  <!-- End Feature Modal -->
+  
   <!-- Layer Modal -->
     <div id="layerModal" class="modal fade bs-layer-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
       <div class="modal-dialog modal-sm" role="document">
@@ -103,7 +131,7 @@
 
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
                       <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
-                        <small>${feature.name}</small>
+                        <small>${feature.properties.name}</small>
                         <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex)"></span>
                       </a>
                   </div>
@@ -130,9 +158,9 @@
 {% endblock content %}
 
 {% block jsinclude %}
-  <script src="{% static 'maps/js/maplayers.js' %}"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.js"></script>
+  <script src="{% static 'maps/js/maplayers.js' %}"></script>
   <script type="text/javascript">
     /* global $ */
     /* global maplayersApp */
@@ -157,6 +185,66 @@
     attribution.setPrefix('<img src="https://docs.onemap.sg/maps/images/oneMap64-01.png" style="height:20px;width:20px;"/>');
     map.setMaxBounds([[1.56073, 104.1147], [1.16, 103.502]]);
     basemap.addTo(map);
+    
+    var drawnItems = new L.FeatureGroup();
+    map.addLayer(drawnItems);
+    
+    var drawControl = new L.Control.Draw({
+      edit: {
+        featureGroup: drawnItems
+      }
+    });
+    
+    map.addControl(drawControl);
+    
+    
+    /* to check whether the drawing just started
+    // if it is inital draw, map will zoom to the 
+    // drawing boundary for further detail drawing
+    */
+    var initialDraw = true;
+    
+    map.on('draw:created', function(e){
+      
+      // console.log(e);
+      // var dFeature = e.layer.feature = e.layer.feature || {};
+      //dFeature.id = Date.now() / 1000 | 0;
+      // console.log(dFeature);
+      // dFeature.type = dFeature.type || {};
+      
+     //  var props = dFeature.properties = dFeature.properties || {};
+      
+      // props._id = 12;
+      // props.tags = {
+      //   buildingpart: 'room'
+      // };
+      
+      // if it is inital draw, map will zoom to the 
+      // drawing boundary for further detail drawing
+      
+      maplayersApp.drawnLayer = e.layer;
+      
+      // var layer = e.layer,
+      //   feature = layer.feature = layer.feature || {}; // Intialize layer.feature
+
+      // feature.type = feature.type || "Feature"; // Intialize feature.type
+      // feature.id = drawnItems.getLayers().length;
+      // var props = feature.properties = feature.properties || {}; // Intialize feature.properties
+      // props.title = "my title";
+      // props.content = "my content";
+      // drawnItems.addLayer(layer);
+      
+      if (initialDraw){
+        map.fitBounds(e.layer.getBounds());
+        initialDraw = false;
+      }
+      
+      
+      //drawnItems.addLayer(layer); // moved this to addFeature function
+      
+      $('#featureModal').modal('show');
+      
+    });
     
     
   </script>
