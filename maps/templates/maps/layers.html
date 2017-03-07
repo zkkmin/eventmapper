@@ -25,6 +25,7 @@
     line-height: inherit !important;
   }
 </style>
+<link rel="stylesheet" type="text/css" href="{% static 'maps/css/tt.css' %}"  
 {% endblock stylecode %}
 
 
@@ -34,10 +35,15 @@
   <div>
     <span ><a href="{% url 'account_logout' %}">Log out</a></span>
     <span ><a href="{% url 'account_change_password' %}">Change Password</a></span>
+    <div id="bloodhound" class="pull-right">
+      <input class="typeahead form-control" type="text" placeholder="Search a location" />
+    </div>
   </div>
   
   <hr/>
   
+  
+    
   <!-- Feature Modal -->
     <div id="featureModal" class="modal fade bs-feature-modal-sm" tabindex="-2" role="dialog" aria-labelledby="mySmallModalLabel">
       <div class="modal-dialog modal-sm" role="document">
@@ -161,10 +167,42 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.js"></script>
   <script src="{% static 'maps/js/maplayers.js' %}"></script>
+  <script src="{% static 'maps/js/typeahead.js' %}"></script>
   <script type="text/javascript">
     /* global $ */
     /* global maplayersApp */
     /* global L */
+    
+    // typeahead
+    
+    var locations = new Bloodhound({
+      datumTokenizer: Bloodhound.tokenizers.obj.whitespace('results'),
+      queryTokenizer: Bloodhound.tokenizers.whitespace,
+      
+      remote: {
+        url: 'https://developers.onemap.sg/commonapi/search?searchVal=%QUERY&returnGeom=Y&getAddrDetails=Y&pageNum=1',
+        wildcard: '%QUERY',
+        transform: function(response){
+        console.log(response.results);
+        return response.results;
+      }
+      }
+      
+      
+      
+    });
+    
+    $('#bloodhound .typeahead').typeahead(null,
+    {
+      name: 'locations',
+      source: locations,
+      display: 'BUILDING'
+    });
+    
+    
+    
+    // end typeahead
+    
     
     // to clear up form data after the modal is closed
     $('#layerModal').on('hide.bs.modal', function(e) {
@@ -246,6 +284,12 @@
       
     });
     
+    
+    $('.typeahead').bind('typeahead:select', function(ev, suggestion) {
+      console.log(suggestion);
+      var latlng = L.latLng(parseFloat(suggestion.LATITUDE), parseFloat(suggestion.LONGITUDE));
+      map.setView(latlng, 19);
+    });
     
   </script>
 {% endblock jsinclude %}
