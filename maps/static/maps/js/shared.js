@@ -42,11 +42,11 @@ var maplayersApp = new Vue({
                  //console.log(l);
 
                  if ( l.feature.id === feature.id){
-                     l.setStyle({color: 'red', weight: '5', opacity: 0.5});
+                     l.setStyle({ weight: '5', opacity: 0.5});
                      l.openPopup();
                  }
                  else{
-                     l.setStyle({color: 'blue', weight: '2', opacity: 0.7});
+                     l.setStyle({ weight: '2', opacity: 0.7});
                  }
                  
              }
@@ -98,12 +98,12 @@ var maplayersApp = new Vue({
                             props.name = obj.properties.name;
                             props.description = obj.properties.description;
                             props.ownerLayer = obj.properties.ownerLayer;
-                            
+                            props.color = obj.properties.color;
                             // control.addOverlay(temp, props.name);
                             // group them as layer group
                             // drawnItems.addLayer(temp);
                             
-                            temp.setStyle({color: 'blue', weight:2, opacity:0.7});
+                            temp.setStyle({color: props.color, weight:2, opacity:0.7});
                            
                             temp.bindPopup("<b>" + props.name + "</b><br/>" + props.description);
                             tempLayerGroup.addLayer(temp);

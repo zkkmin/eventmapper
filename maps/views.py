@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404
 
 from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 
 from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import list_route, detail_route
@@ -22,7 +24,8 @@ class SharedMapView(TemplateView):
         return context
 
 
-class MapLayersView(LoginRequiredMixin, TemplateView):
+@method_decorator(login_required, name='dispatch')
+class MapLayersView(TemplateView):
     """
     This view checks whether the map id belongs to 
     current user.
@@ -53,7 +56,7 @@ class EventMapViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
         
     
-    @list_route(permission_classes=[permissions.IsAuthenticated],
+    @list_route(permission_classes=[permissions.IsAuthenticatedOrReadOnly],
                 url_name='mymaps')
     def mymaps(self, request):
         user = request.user
@@ -68,7 +71,7 @@ class EventMapViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(eventmaps, many=True)
         return Response(serializer.data)
         
-    @detail_route(permission_classes=[permissions.IsAuthenticated],
+    @detail_route(permission_classes=[permissions.IsAuthenticatedOrReadOnly],
                 url_name='mlayers')
     def mlayers(self, request, pk=None):
         layers = Layer.objects.filter(eventmap__pk=pk)

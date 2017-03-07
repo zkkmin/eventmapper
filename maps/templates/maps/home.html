@@ -2,17 +2,27 @@
 
 {% load staticfiles %}
 
+
+{% block stylecode %}
+{% if  request.user.is_authenticated == False %}
+<style type="text/css">
+  body { 
+  background: url({% static "maps/img/onemap-night.jpg" %}) no-repeat center center fixed; 
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+</style>
+{% endif %}
+{% endblock stylecode %}
+
 {% block content %}
-<div class="container">
-  <h1>Welcome</h1>
-  <div>
-    <span ><a href="{% url 'account_logout' %}">Log out</a></span>
-    <span ><a href="{% url 'account_change_password' %}">Change Password</a></span>
-  </div>
-  
-      
-  <hr/>
+
+
+
   {% if request.user.is_authenticated %}
+    <div class="container-fluid">
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#createMapModal">
         Create Map
       </button>
@@ -26,6 +36,7 @@
               <a href="#" @click='editMap(m.pk)'>edit</a>&nbsp;&nbsp;
               <a href="#" @click="deleteMap(m.pk)">delete</a>&nbsp;&nbsp;
               <a class="btn btn-primary btn-xs" role="button" v-bind:href="'/maps/' + m.pk + '/layers/'" >Add Layers</a>
+              <a class="btn btn-success btn-xs" target="_blank" role="button" v-bind:href="'/shared/' + m.pk + '/'" >Share Map</a>
             </span>
           </li>
         </ul>
@@ -110,14 +121,32 @@
         <!-- end of model dialogs -->
       
       </div>
-      
+    </div>
   {% else %}
-      <div>
-          <a class="btn btn-primary btn-lg" href="{% url 'account_login' %}">Log in</a> OR <a class="btn btn-success btn-lg" href="{% url 'account_signup' %}">Sign up</a>
+          <!-- Main jumbotron for a primary marketing message or call to action -->
+      <div class=" container">
+        <div class="jumbotron">
+          <h1>Welcome to EventMapper</h1>
+          <p>
+            A web application platform for creating and sharing map based guides and indoor maps for buildings. 
+            
+          </p>
+          
+          <p>
+            <div>
+              <a class="btn btn-lg btn-primary" href="{% url 'account_login' %}">Log in</a> or <a class="btn btn-success btn-lg" href="{% url 'account_signup' %}">Sign up</a>
+            </div>
+          </p>
+          
+        </div>
+        
+        
       </div>
+
+      
   {% endif %}
   
-</div>
+
 
 {% endblock content %}
 

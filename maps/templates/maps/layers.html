@@ -4,9 +4,7 @@
 
 {% block stylecode %}
 <style>
-  body{
-    background-color: #f5f8fa;
-  }
+  
   .no-margin-bottom {
     margin-bottom: 0px;
   }
@@ -31,18 +29,21 @@
 
 {% block content %}
 <div class="container-fluid" id="root">
-  <h1>Add Layers</h1>
-  <div>
-    <span ><a href="{% url 'account_logout' %}">Log out</a></span>
-    <span ><a href="{% url 'account_change_password' %}">Change Password</a></span>
-    <div id="bloodhound" class="pull-right">
-      <input class="typeahead form-control" type="text" placeholder="Search a location" />
+  <h2 class="hidden">Map Editor</h2>
+  <div class="row">
+    
+    <div class="col-col-md-12">
+      <div id="bloodhound" class="pull-right">
+        <input class="typeahead form-control" type="text" placeholder="Search a location" />
+      </div>
     </div>
+    
   </div>
   
   <hr/>
   
-  
+
+  <!-- End Feature Modal -->
     
   <!-- Feature Modal -->
     <div id="featureModal" class="modal fade bs-feature-modal-sm" tabindex="-2" role="dialog" aria-labelledby="mySmallModalLabel">
@@ -136,10 +137,35 @@
                   </div>
 
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
-                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features">
+                      <li  class="list-group-item " v-for="(feature, featureIndex) in l.features">
                         <small>${feature.properties.name}</small>
-                        <span class="glyphicon glyphicon-trash inherit-lineheight pull-right" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex, feature.id, l.pk)"></span>
-                      </a>
+                        <a class=" pull-right" href="#">
+                          <span class="glyphicon glyphicon-trash inherit-lineheight" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex, feature.id, l.pk)"></span>
+                        </a>
+                        
+                        <!-- Single button -->
+                        <div class="btn-group pull-right" style="width:70px !important;">
+                          <button type="button" 
+                                  class="btn btn-default btn-xs dropdown-toggle" 
+                                  data-toggle="dropdown" 
+                                  aria-haspopup="true" 
+                                  aria-expanded="false" 
+                                  v-bind:style="{borderBottomStyle: 'solid',borderBottomColor: feature.properties.color}"
+                                  >
+                           ${feature.properties.color} <span class="caret"></span>
+                          </button>
+                          <ul class="dropdown-menu">
+                            <li style="border-bottom-style: solid;border-bottom-color: blue;"><a href="#" @click='changeColor(feature.id, l.pk, "blue")'>Blue</a></li>
+                            <li style="border-bottom-style: solid;border-bottom-color: green;"><a href="#" @click='changeColor(feature.id, l.pk, "green")'>Green</a></li>
+                            <li style="border-bottom-style: solid;border-bottom-color: red;"><a href="#" @click='changeColor(feature.id, l.pk, "red")'>Red</a></li>
+                            <li style="border-bottom-style: solid;border-bottom-color: yellow;"><a href="#" @click='changeColor(feature.id, l.pk, "yellow")'>Yellow</a></li>
+                            <li style="border-bottom-style: solid;border-bottom-color: black;"><a href="#" @click='changeColor(feature.id, l.pk, "black")'>Black</a></li>
+                            <li style="border-bottom-style: solid;border-bottom-color: white;"><a href="#" @click='changeColor(feature.id, l.pk, "white")'>White</a></li>
+                            
+                            
+                          </ul>
+                        </div> <!-- button group -->
+                      </li>
                   </div>
 
                 </div>

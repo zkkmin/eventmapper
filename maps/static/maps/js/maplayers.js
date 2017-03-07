@@ -110,9 +110,9 @@ var maplayersApp = new Vue({
                             props.name = obj.properties.name;
                             props.description = obj.properties.description;
                             props.ownerLayer = obj.properties.ownerLayer;
+                            props.color = obj.properties.color;
                             
-                            
-                            temp.setStyle({color: "blue", weight: 1, opacity: 0.7});
+                            temp.setStyle({color: props.color, weight: 1, opacity: 0.7});
                             drawnItems.addLayer(temp);
                             
                         });
@@ -190,6 +190,7 @@ var maplayersApp = new Vue({
             props.name = this.feature.name;
             props.description = this.feature.description;
             props.ownerLayer = layerToEdit.pk;
+            props.color = "blue";
             layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
             drawnItems.addLayer(layer);
             
@@ -228,6 +229,56 @@ var maplayersApp = new Vue({
             });
              
         },
+        
+        changeColor: function(featureId, layerId, color){
+              console.log(color);
+              
+              // this.layers[layerIndex].features[featureIndex].properties.color = color;
+              
+              drawnItems.eachLayer(function(l){
+                 if(l.feature.id == featureId && l.feature.properties.ownerLayer == layerId){
+                     console.log(l);
+                     l.setStyle({'color': color});
+                     l.feature.properties.color = color;
+                 } 
+              });
+              
+            // update json data
+            // TODO: duplicate code with addFeature; need to split;
+            var layerToEdit = this.layers[this.selectedLayer];
+            this.json_data = drawnItems.toGeoJSON();
+            console.log(this.json_data);
+            // Filter only the features of this layer
+            function belongsTo(featureVal){
+                return featureVal.properties.ownerLayer == layerToEdit.pk;
+             }
+             this.json_data.features = this.json_data.features.filter(belongsTo);
+            
+            var _that = this;
+            // https://eventmapper-zkkmin.c9users.io/api/layers/12/
+            axios.patch('/api/layers/' + layerToEdit.pk + '/', 
+                        { json_data: this.json_data }, 
+                        {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}} 
+            )
+            .then(function(response){
+                console.log(response);
+                
+                layerToEdit.features = [];
+                response.data.json_data.features.forEach(function(obj){
+                    if (obj.properties.ownerLayer == layerToEdit.pk){
+                        layerToEdit.features.push(obj);     
+                    }
+                    
+                });
+                // _that.layers.push(layerToEdit);
+                
+            })
+            .catch(function(error){
+                console.log(error.data)
+            });
+          
+        },
+        
         
         deleteFeature: function(layerIndex, featureIndex, featureId, layerId) {
             

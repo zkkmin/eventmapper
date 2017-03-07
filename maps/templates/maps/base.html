@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>{% block title %}{% endblock title %}</title>
+    <title>{% block title %}EventMapper{% endblock title %}</title>
 
     <!-- Bootstrap -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -25,17 +25,77 @@
     <style type="text/css">
       [v-cloak] { display:none; }
       
+      body{
+        background-color: #f5f8fa;
+      }
+      
+      .jumbotron {
+        background-color: rgba(29, 161, 242, .8);
+        color: white;
+        
+      }
+      
+      .navbar-default {
+        background-color: white;
+      }
+      
+      .no-margin {
+        margin-bottom: 0px !important;
+      }
     </style>
     {% block stylecode %}{% endblock stylecode %}
   </head>
   <body>
-    <div class="container-fluid" id="root">
-        
+    <!-- Nav bar -->
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default nav-bar-fixed-top ">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="/">
+            EventMapper
+          </a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse navbar-right">
+          
+          <ul class="nav navbar-nav">
+            
+              <li><a href="/">Home</a></li>
+            
+            <li><a href="#about">About</a></li>
+            
+            {% if  request.user.is_authenticated %}
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.user.username }} <span class="caret"></span></a>
+              <ul class="dropdown-menu ">
+                <li><a href="{% url 'account_change_password' %}">Change password</a></li>
+                
+                <li role="separator" class="divider"></li>
+                
+                <li><a href="{% url 'account_logout' %}">Log out</a></li>
+                
+              </ul>
+            </li>
+            {% endif %}
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+    <!-- / nav bar -->
+
+
+    
+
         {% block content %}
         
         {% endblock content %}
         
-    </div>
+    
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
