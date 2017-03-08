@@ -35,18 +35,25 @@ var maplayersApp = new Vue({
     
     methods: {
         
+        checkAndSetStyle: function(style, l){
+          if (l.feature.properties.type !== 'marker') {
+              l.setStyle(style);
+          } 
+        },
+        
         onFeatureClicked: function(feature){
+          _that = this;
           map.eachLayer(function(l){
              
-             if(l.feature != undefined){
+             if(l.feature != undefined ){
                  //console.log(l);
-
+                    
                  if ( l.feature.id === feature.id){
-                     l.setStyle({ weight: '5', opacity: 0.5});
+                     _that.checkAndSetStyle({ weight: '5', opacity: 0.5}, l);
                      l.openPopup();
                  }
                  else{
-                     l.setStyle({ weight: '2', opacity: 0.7});
+                     _that.checkAndSetStyle({ weight: '2', opacity: 0.7}, l);
                  }
                  
              }
@@ -99,11 +106,14 @@ var maplayersApp = new Vue({
                             props.description = obj.properties.description;
                             props.ownerLayer = obj.properties.ownerLayer;
                             props.color = obj.properties.color;
+                            props.type = obj.properties.type;
                             // control.addOverlay(temp, props.name);
                             // group them as layer group
                             // drawnItems.addLayer(temp);
+                            if (props.type !== 'marker'){
+                                temp.setStyle({color: props.color, weight:2, opacity:0.7});
+                            }
                             
-                            temp.setStyle({color: props.color, weight:2, opacity:0.7});
                            
                             temp.bindPopup("<b>" + props.name + "</b><br/>" + props.description);
                             tempLayerGroup.addLayer(temp);

@@ -144,7 +144,7 @@
                         </a>
                         
                         <!-- Single button -->
-                        <div class="btn-group pull-right" style="width:70px !important;">
+                        <div class="btn-group pull-right" style="width:70px !important;" v-if="feature.properties.type !== 'marker'">
                           <button type="button" 
                                   class="btn btn-default btn-xs dropdown-toggle" 
                                   data-toggle="dropdown" 
@@ -270,37 +270,15 @@
     
     map.on('draw:created', function(e){
       
-      // console.log(e);
-      // var dFeature = e.layer.feature = e.layer.feature || {};
-      //dFeature.id = Date.now() / 1000 | 0;
-      // console.log(dFeature);
-      // dFeature.type = dFeature.type || {};
       
-     //  var props = dFeature.properties = dFeature.properties || {};
-      
-      // props._id = 12;
-      // props.tags = {
-      //   buildingpart: 'room'
-      // };
-      
-      // if it is inital draw, map will zoom to the 
-      // drawing boundary for further detail drawing
       
       maplayersApp.drawnLayer = e.layer;
+      maplayersApp.type = e.layerType;
       
-      // var layer = e.layer,
-      //   feature = layer.feature = layer.feature || {}; // Intialize layer.feature
-
-      // feature.type = feature.type || "Feature"; // Intialize feature.type
-      // feature.id = drawnItems.getLayers().length;
-      // var props = feature.properties = feature.properties || {}; // Intialize feature.properties
-      // props.title = "my title";
-      // props.content = "my content";
-      // drawnItems.addLayer(layer);
       
       if (initialDraw){
-        map.fitBounds(e.layer.getBounds());
-        initialDraw = false;
+        //map.fitBounds(e.layer.getBounds());
+        //initialDraw = false;
       }
       
       

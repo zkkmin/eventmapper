@@ -34,6 +34,7 @@ var maplayersApp = new Vue({
           data: {}
         }, //feature
         drawnLayer: {}, // {featureid, drawnLayer}
+        type: "", // marker or else
         json_data: {}, // to hold drawnItems.toGeoJson
     },
     
@@ -111,8 +112,11 @@ var maplayersApp = new Vue({
                             props.description = obj.properties.description;
                             props.ownerLayer = obj.properties.ownerLayer;
                             props.color = obj.properties.color;
+                            props.type = obj.properties.type;
+                            if (props.type !== "marker"){
+                                temp.setStyle({color: props.color, weight: 1, opacity: 0.7});    
+                            }
                             
-                            temp.setStyle({color: props.color, weight: 1, opacity: 0.7});
                             drawnItems.addLayer(temp);
                             
                         });
@@ -191,7 +195,13 @@ var maplayersApp = new Vue({
             props.description = this.feature.description;
             props.ownerLayer = layerToEdit.pk;
             props.color = "blue";
-            layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
+            props.type = this.type;
+            
+            if (this.type !== 'marker'){
+                layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
+            }
+            
+            
             drawnItems.addLayer(layer);
             
             console.log('add Feature');
@@ -236,7 +246,7 @@ var maplayersApp = new Vue({
               // this.layers[layerIndex].features[featureIndex].properties.color = color;
               
               drawnItems.eachLayer(function(l){
-                 if(l.feature.id == featureId && l.feature.properties.ownerLayer == layerId){
+                 if(l.feature.id == featureId && l.feature.properties.ownerLayer == layerId && l.feature.properties.type !== "marker"){
                      console.log(l);
                      l.setStyle({'color': color});
                      l.feature.properties.color = color;
