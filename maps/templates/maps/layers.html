@@ -22,6 +22,12 @@
   .inherit-lineheight {
     line-height: inherit !important;
   }
+  
+  .draggable-item {
+    cursor: pointer; 
+    cursor: hand;
+  }
+  
 </style>
 <link rel="stylesheet" type="text/css" href="{% static 'maps/css/tt.css' %}"  
 {% endblock stylecode %}
@@ -130,14 +136,15 @@
                       v-bind:class="{'layer-panel-selected': (layerIndex === selectedLayer), 'unchecked-font': !l.checked  }">
                   <div class="checkbox">
                     <label>
-                      <input v-on:change="checkboxChanged(l)" 
+                      <input v-on:change="checkboxChanged(l, $event)" 
                               type="checkbox" 
-                              v-model="l.checked"> ${l.name}
+                              v-model="l.checked"> ${l.name} at Level: ${l.building_level}
                     </label>
                   </div>
 
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
-                      <li  class="list-group-item " v-for="(feature, featureIndex) in l.features">
+                    <draggable :list="l.features" @end="onFeatureIndexChange(l)" @start="selectLayer(layerIndex)">
+                      <li  class="list-group-item draggable-item" v-for="(feature, featureIndex) in l.features" >
                         <small>${feature.properties.name}</small>
                         <a class=" pull-right" href="#">
                           <span class="glyphicon glyphicon-trash inherit-lineheight" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex, feature.id, l.pk)"></span>
@@ -165,7 +172,8 @@
                             
                           </ul>
                         </div> <!-- button group -->
-                      </li>
+                      </li> <!-- / v-for l.features -->
+                    </draggable>  
                   </div>
 
                 </div>
@@ -192,6 +200,9 @@
 {% block jsinclude %}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.0/leaflet.draw.js"></script>
+  <script src="https://cdn.jsdelivr.net/sortable/1.4.2/Sortable.min.js"></script>
+  <script src="https://cdn.rawgit.com/David-Desmaisons/Vue.Draggable/master/dist/vuedraggable.min.js"></script>
+  
   <script src="{% static 'maps/js/maplayers.js' %}"></script>
   <script src="{% static 'maps/js/typeahead.js' %}"></script>
   <script type="text/javascript">
@@ -270,22 +281,16 @@
     
     map.on('draw:created', function(e){
       
-      
-      
-      maplayersApp.drawnLayer = e.layer;
-      maplayersApp.type = e.layerType;
-      
-      
-      if (initialDraw){
-        //map.fitBounds(e.layer.getBounds());
-        //initialDraw = false;
+      if (maplayersApp.layers.length == 0){
+        alert('Please add a layer first before drawing!');
+      }
+      else{
+        maplayersApp.drawnLayer = e.layer;
+        maplayersApp.type = e.layerType;
+        $('#featureModal').modal('show');
       }
       
-      
-      //drawnItems.addLayer(layer); // moved this to addFeature function
-      
-      $('#featureModal').modal('show');
-      
+     
     });
     
     

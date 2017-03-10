@@ -148,7 +148,7 @@ STATIC_URL = '/static/'
 
 
 REST_FRAMEWORK = {
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 100,
 }
 
 # django-allauth settings

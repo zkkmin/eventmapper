@@ -151,6 +151,7 @@
 {% endblock content %}
 
 {% block jsinclude %}
+{% if request.user.is_authenticated %}
   <script src="{% static 'maps/js/dashboard.js' %}"></script>
   <script type="text/javascript">
     /* global $ */
@@ -164,4 +165,5 @@
       dashboardApp.clearFormData();
     });
   </script>
+{% endif %}
 {% endblock jsinclude %}

@@ -59,10 +59,95 @@ var maplayersApp = new Vue({
     }, // computed
     
     mounted() {
-      this.getlayerlist();  
+        this.getlayerlist(); 
+          
+      
     },
     
     methods: {
+        
+        sortFeatures: function(arr){
+            arr.sort(function (a, b){
+                          return parseInt(a.properties.index) - parseInt(b.properties.index );
+                        });  
+        },
+        
+        updateFeatureProperty: function(){
+            // This function will update the properties value of
+            // a feature in a layer
+            
+            var layerToEdit = this.layers[this.selectedLayer];
+            this.json_data = drawnItems.toGeoJSON();
+            console.log(this.json_data);
+            // Filter only the features of this layer
+            function belongsTo(featureVal){
+                return featureVal.properties.ownerLayer == layerToEdit.pk;
+             }
+             this.json_data.features = this.json_data.features.filter(belongsTo);
+            
+            var _that = this;
+            // https://eventmapper-zkkmin.c9users.io/api/layers/12/
+            axios.patch('/api/layers/' + layerToEdit.pk + '/', 
+                        { json_data: this.json_data }, 
+                        {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}} 
+            )
+            .then(function(response){
+                console.log(response);
+                _that.sortFeatures(response.data.json_data.features);
+                
+                layerToEdit.features = [];
+                response.data.json_data.features.forEach(function(obj){
+                    if (obj.properties.ownerLayer == layerToEdit.pk){
+                        layerToEdit.features.push(obj);     
+                    }
+                    
+                });
+                // _that.layers.push(layerToEdit);
+                
+            })
+            .catch(function(error){
+                console.log(error)
+            });
+          
+            
+        },
+        
+        onFeatureIndexChange: function(l){
+           
+            console.log(l);
+            
+            
+            l.features.forEach(function(f, i){
+                console.log(f.id + ": " + f.properties.name + ": " + i );
+                
+                drawnItems.eachLayer(function(dLayer){
+                   if(dLayer.feature.id === f.id && dLayer.feature.properties.ownerLayer === f.properties.ownerLayer){
+                       dLayer.feature.properties.index = i;
+                   } 
+                });
+                
+            });
+            
+            this.updateFeatureProperty();
+            
+            
+            
+            // console.log(this.)
+            // console.log(evt.item._underlying_vm_.id);
+            // var movedFeatureId = evt.item._underlying_vm_.id;
+            // var ownerLayerId = evt.item._underlying_vm_.properties.ownerLayer;
+            
+            // console.log(evt);
+            
+            // drawnItems.eachLayer(function(l){
+            //      if(l.feature.id == movedFeatureId && l.feature.properties.ownerLayer == ownerLayerId ){
+                     
+            //          l.feature.properties.index = evt.newIndex;
+            //      } 
+            //   });
+            // this.updateFeatureProperty();
+            
+        },
         
         errorFormData: function(error){
             if(error.response.data.name){
@@ -98,9 +183,13 @@ var maplayersApp = new Vue({
                     
                     results[i].features = [];
                     if (results[i].json_data.features){
+                        
+                        _that.sortFeatures( results[i].json_data.features);
+
                         results[i].json_data.features.forEach(function( obj) {
+                            
                             results[i].features.push(obj);
-                            console.log(obj);
+                            
                             var temp = L.GeoJSON.geometryToLayer(obj);
                             // console.log(temp);
                             
@@ -113,11 +202,14 @@ var maplayersApp = new Vue({
                             props.ownerLayer = obj.properties.ownerLayer;
                             props.color = obj.properties.color;
                             props.type = obj.properties.type;
+                            props.index = obj.properties.index;
                             if (props.type !== "marker"){
                                 temp.setStyle({color: props.color, weight: 1, opacity: 0.7});    
                             }
                             
                             drawnItems.addLayer(temp);
+                            
+                            temp.setStyle({opacity: 0, fillOpacity: 0});
                             
                         });
                     }
@@ -136,8 +228,29 @@ var maplayersApp = new Vue({
             
         },
         
-        checkboxChanged: function(changedLayer){
+        checkboxChanged: function(layer, event){
             
+            if (layer.checked){
+                //set opicity of to 0 of this group
+                drawnItems.eachLayer(function(l){
+                 if(l.feature.properties.ownerLayer == layer.pk ){
+                     console.log(l);
+                     l.setStyle({opacity: 0.7, fillOpacity: 0.2});
+                     
+                 } 
+              }); 
+
+            }
+            else{
+                //set opicity of to 0 of this group
+                drawnItems.eachLayer(function(l){
+                 if(l.feature.properties.ownerLayer == layer.pk ){
+                     console.log(l);
+                     l.setStyle({opacity: 0, fillOpacity: 0});
+                     
+                 } 
+              });  
+            }
         },
         
         showDetail: function (index){},
@@ -151,15 +264,17 @@ var maplayersApp = new Vue({
             )
             .then(function (response){
                // console.log(response); 
-               _that.layers.push({
-                   name: response.data.name,
-                   level: response.data.building_level,
-                   checked: false,
-                   features: [],
-                   pk: response.data.pk
-               });
-               _that.clearFormData();
-               $('#layerModal').modal('hide');
+            //   _that.layers.push({
+            //       name: response.data.name,
+            //       level: response.data.building_level,
+            //       checked: false,
+            //       features: [],
+            //       pk: response.data.pk
+            //   });
+            
+                _that.getlayerlist();
+                _that.clearFormData();
+                $('#layerModal').modal('hide');
                
             })
             .catch(function(error){
@@ -196,6 +311,7 @@ var maplayersApp = new Vue({
             props.ownerLayer = layerToEdit.pk;
             props.color = "blue";
             props.type = this.type;
+            props.index = layerToEdit.features.length;
             
             if (this.type !== 'marker'){
                 layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
@@ -253,39 +369,7 @@ var maplayersApp = new Vue({
                  } 
               });
               
-            // update json data
-            // TODO: duplicate code with addFeature; need to split;
-            var layerToEdit = this.layers[this.selectedLayer];
-            this.json_data = drawnItems.toGeoJSON();
-            console.log(this.json_data);
-            // Filter only the features of this layer
-            function belongsTo(featureVal){
-                return featureVal.properties.ownerLayer == layerToEdit.pk;
-             }
-             this.json_data.features = this.json_data.features.filter(belongsTo);
-            
-            var _that = this;
-            // https://eventmapper-zkkmin.c9users.io/api/layers/12/
-            axios.patch('/api/layers/' + layerToEdit.pk + '/', 
-                        { json_data: this.json_data }, 
-                        {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}} 
-            )
-            .then(function(response){
-                console.log(response);
-                
-                layerToEdit.features = [];
-                response.data.json_data.features.forEach(function(obj){
-                    if (obj.properties.ownerLayer == layerToEdit.pk){
-                        layerToEdit.features.push(obj);     
-                    }
-                    
-                });
-                // _that.layers.push(layerToEdit);
-                
-            })
-            .catch(function(error){
-                console.log(error.data)
-            });
+            this.updateFeatureProperty();
           
         },
         

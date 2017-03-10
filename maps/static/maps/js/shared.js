@@ -42,7 +42,7 @@ var maplayersApp = new Vue({
         },
         
         onFeatureClicked: function(feature){
-          _that = this;
+          var _that = this;
           map.eachLayer(function(l){
              
              if(l.feature != undefined ){
@@ -51,6 +51,17 @@ var maplayersApp = new Vue({
                  if ( l.feature.id === feature.id){
                      _that.checkAndSetStyle({ weight: '5', opacity: 0.5}, l);
                      l.openPopup();
+                     // extract first point from feature
+                     // setView
+                      
+                     if (l.feature.properties.type === 'marker') {
+                        map.setView(l._latlng, 19);   
+                     }
+                     else {
+                         var middle = parseInt( l._latlngs.length / 2 );
+                         map.setView(l._latlngs[0], 19);
+                     }
+                     
                  }
                  else{
                      _that.checkAndSetStyle({ weight: '2', opacity: 0.7}, l);
@@ -92,6 +103,11 @@ var maplayersApp = new Vue({
                     results[i].features = [];
                     if (results[i].json_data.features){
                         var tempLayerGroup = L.layerGroup();
+                        
+                        results[i].json_data.features.sort(function (a, b){
+                          return parseInt(a.properties.index) - parseInt(b.properties.index );
+                        });  
+                        
                         results[i].json_data.features.forEach(function( obj) {
                             results[i].features.push(obj);
                             console.log(obj);
@@ -119,12 +135,12 @@ var maplayersApp = new Vue({
                             tempLayerGroup.addLayer(temp);
                         }); // end foreach
                         
-                        tempLayerGroup.addTo(map);
-                        //_that.lgroups.push(tempLayerGroup);
+                        // tempLayerGroup.addTo(map);
+                        
                         
                     } // endif
                     
-                    results[i].checked = true;
+                    results[i].checked = false;
                     results[i].layerGroup = tempLayerGroup || undefined;
                     _that.layers.push(results[i]);
                     

@@ -62,7 +62,7 @@
                     <label>
                       <input v-on:change="checkboxChanged(l, $event)" 
                               type="checkbox" 
-                              v-model="l.checked"> ${l.name}
+                              v-model="l.checked"> ${l.name} at Level: ${l.building_level}
                     </label>
                     
                   </div>
@@ -111,7 +111,7 @@
     // load map into #mapdiv
     var map = L.map('mapdiv').setView([1.3384936555025502, 103.80895614624023], 12);
 
-    var basemap = L.tileLayer('https://maps-{s}.onemap.sg/v3/Default/{z}/{x}/{y}.png', {
+    var basemap = L.tileLayer('https://maps-{s}.onemap.sg/v3/Grey/{z}/{x}/{y}.png', {
       detectRetina: true,
       attribution: 'Map data © contributors, <a href="http://SLA.gov.sg">Singapore Land Authority</a>',
       maxZoom: 28,
