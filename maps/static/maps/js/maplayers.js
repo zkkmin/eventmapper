@@ -4,6 +4,8 @@
 /* global Qs */
 /* global $ */
 /* global drawnItems */
+/* global map */
+/* global L */
 
 var maplayersApp = new Vue({
     delimiters: ['${', '}'],
@@ -65,7 +67,7 @@ var maplayersApp = new Vue({
     },
     
     methods: {
-        hideFeature: function(l){
+        hideFeature: function (l) {
             if (l.feature.properties.type === 'marker'){
                 l.setOpacity(0);
             }
@@ -74,7 +76,7 @@ var maplayersApp = new Vue({
             }
         },
         
-        showFeature: function(l){
+        showFeature: function (l) {
             if (l.feature.properties.type === 'marker'){
                 l.setOpacity(1);
             }
@@ -83,13 +85,13 @@ var maplayersApp = new Vue({
             }
         },
         
-        sortFeatures: function(arr){
+        sortFeatures: function (arr) {
             arr.sort(function (a, b){
                           return parseInt(a.properties.index) - parseInt(b.properties.index );
                         });  
         },
         
-        updateFeatureProperty: function(){
+        updateFeatureProperty: function () {
             // This function will update the properties value of
             // a feature in a layer
             
@@ -129,7 +131,7 @@ var maplayersApp = new Vue({
             
         },
         
-        onFeatureIndexChange: function(l){
+        onFeatureIndexChange: function (l) {
            
             console.log(l);
             
@@ -166,7 +168,34 @@ var maplayersApp = new Vue({
             
         },
         
-        errorFormData: function(error){
+        onFeatureClicked: function (feature) {
+            var _that = this;
+            map.eachLayer(function (l) {
+                if (l.feature != undefined) {
+                    if (l.feature.id == feature.id) {
+                        if (l.feature.properties.type !== 'marker'){
+                            l.setStyle({ weight: '5', opacity: 0.5 }, 1);
+                            
+                            var middle = parseInt( l._latlngs.length / 2 );
+                             map.setView(l._latlngs[0], 19);
+                        }
+                        else {
+                            map.setView(l._latlng, 19);
+                        } // end check marker
+                        l.openPopup();
+                    }
+                    else {
+                        if (l.feature.properties.type !== 'marker') {
+                            l.setStyle({ weight: '2', opacity: 0.7 }, 1);
+                        }
+                        
+                    } // end check feature id
+
+                }
+            });
+        },
+        
+        errorFormData: function (error) {
             if(error.response.data.name){
                 this.layerNameError = error.response.data.name[0];
                 this.layerNameHasError = true;
@@ -178,7 +207,7 @@ var maplayersApp = new Vue({
             }
         },
         
-        clearFormData: function() {
+        clearFormData: function () {
             this.layer = {};
             this.layerNameHasError = false;
             this.layerLvlHasError = false;
@@ -186,7 +215,7 @@ var maplayersApp = new Vue({
             this.layerLvlError = '';
         },
         
-        getlayerlist: function(onFirstLoad){
+        getlayerlist: function (onFirstLoad) {
             var _that = this;
             axios.get('/api/eventmaps/' + this.mapPk + '/mlayers/')
             .then(function (response){
@@ -221,7 +250,7 @@ var maplayersApp = new Vue({
                             props.type = obj.properties.type;
                             props.index = obj.properties.index;
                             
-                            
+                            temp.bindPopup("<b>" + props.name + "</b><br/>" + props.description);
                             // if page is just loaded and 
                             // the first layer is shown 
                             if (onFirstLoad && i === 0){
@@ -269,12 +298,12 @@ var maplayersApp = new Vue({
             });
         },
         
-        selectLayer: function(index, alayer){
+        selectLayer: function (index, alayer) {
             this.selectedLayer = index;
             
         },
         
-        checkboxChanged: function(layer, event){
+        checkboxChanged: function (layer, event) {
             
             var _that = this;
             if (layer.checked){
@@ -302,9 +331,9 @@ var maplayersApp = new Vue({
             }
         },
         
-        showDetail: function (index){},
+        showDetail: function (index) {},
         
-        addLayer: function(alayer){
+        addLayer: function (alayer) {
             console.log(alayer);
             var _that = this;
             axios.post('/api/layers/',
@@ -333,7 +362,7 @@ var maplayersApp = new Vue({
             
         },
         
-        deleteLayer: function(){
+        deleteLayer: function () {
             console.log(this.selectedLayer);
             var layerToDelete = this.layers[this.selectedLayer];
             // need to remove features associated with it
@@ -345,7 +374,7 @@ var maplayersApp = new Vue({
             
         },
         
-        addFeature: function(){
+        addFeature: function () {
             // the layer is already saved
             // just edit the json field with newly created features
             var layerToEdit = this.layers[this.selectedLayer];
@@ -366,7 +395,7 @@ var maplayersApp = new Vue({
                 layer.setStyle({color: 'blue', weight: 1, opacity: 0.7});
             }
             
-            
+            layer.bindPopup("<b>" + props.name + "</b><br/>" + props.description);
             drawnItems.addLayer(layer);
             
             console.log('add Feature');
@@ -405,7 +434,7 @@ var maplayersApp = new Vue({
              
         },
         
-        changeColor: function(featureId, layerId, color){
+        changeColor: function (featureId, layerId, color) {
               console.log(color);
               
               // this.layers[layerIndex].features[featureIndex].properties.color = color;
@@ -423,7 +452,7 @@ var maplayersApp = new Vue({
         },
         
         
-        deleteFeature: function(layerIndex, featureIndex, featureId, layerId) {
+        deleteFeature: function (layerIndex, featureIndex, featureId, layerId) {
             
             console.log(this.layers[layerIndex].features[featureIndex].properties.name);
             

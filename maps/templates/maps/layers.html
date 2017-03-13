@@ -144,8 +144,18 @@
 
                   <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
                     <draggable :list="l.features" @end="onFeatureIndexChange(l)" @start="selectLayer(layerIndex)">
-                      <li  class="list-group-item draggable-item" v-for="(feature, featureIndex) in l.features" >
-                        <small>${feature.properties.name}</small>
+                      <li  class="list-group-item draggable-item" 
+                            v-for="(feature, featureIndex) in l.features" 
+                            @click='onFeatureClicked(feature)' 
+                            >
+                        
+                        <a href="#"
+                            data-placement="right" 
+                            data-container="body"
+                            v-bind:data-content="feature.properties.description"
+                            data-toggle="popover">
+                          <small>${feature.properties.name}</small>
+                        </a>
                         <a class=" pull-right" href="#">
                           <span class="glyphicon glyphicon-trash inherit-lineheight" aria-hidden="true" @click="deleteFeature(layerIndex, featureIndex, feature.id, l.pk)"></span>
                         </a>
@@ -172,6 +182,8 @@
                             
                           </ul>
                         </div> <!-- button group -->
+                        <br />
+                        <!-- <small class="text-muted">${feature.properties.description}</small> -->
                       </li> <!-- / v-for l.features -->
                     </draggable>  
                   </div>
