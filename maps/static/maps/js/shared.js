@@ -17,6 +17,8 @@ var maplayersApp = new Vue({
         selectedLayer: 0,
         feature: {},
         layer: {},
+        activeFeature: -1,
+        activeLayer: -1,
     },
     
     computed: {
@@ -43,7 +45,9 @@ var maplayersApp = new Vue({
           } 
         },
         
-        onFeatureClicked: function(feature){
+        onFeatureClicked: function(feature, featureIndex, layerIndex){
+            this.activeFeature = featureIndex;
+            this.activeLayer = layerIndex;
           var _that = this;
           map.eachLayer(function(l){
              

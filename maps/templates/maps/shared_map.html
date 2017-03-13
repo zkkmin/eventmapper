@@ -67,10 +67,13 @@
                     
                   </div>
 
-                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}">
-                      <a href="#" class="list-group-item " v-for="(feature, featureIndex) in l.features" @click="onFeatureClicked(feature)">
-                        <small>${feature.properties.name}</small>
+                  <div class="list-group no-margin-bottom" v-bind="{'hidden': !l.checked}" >
+                      <a href="#" class="list-group-item" 
+                          v-bind:class="{'active': (featureIndex === activeFeature && layerIndex === activeLayer) }" 
+                          v-for="(feature, featureIndex) in l.features" 
+                          @click="onFeatureClicked(feature, featureIndex, layerIndex)">
                         
+                          <small>${feature.properties.name}</small>
                       </a>
                   </div>
 
