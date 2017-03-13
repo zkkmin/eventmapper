@@ -156,7 +156,7 @@ var maplayersApp = new Vue({
                 if (results.length > 0 && results[0].features.length > 0){
                     var geometry = results[0].features[0].geometry;
                     var latlng = [];
-                    if (geometry.coordinates.constructor[0] === Array){
+                    if (geometry.coordinates[0].constructor === Array){
                         latlng = geometry.coordinates[0];
                     }
                     else {

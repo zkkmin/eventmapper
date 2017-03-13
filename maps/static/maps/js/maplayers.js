@@ -91,6 +91,58 @@ var maplayersApp = new Vue({
                         });  
         },
         
+        getLayerByPK: function (pk) {
+            function isPkEqualTo(l){
+                return l.pk === pk;
+            }
+            
+            return this.layers.find(isPkEqualTo)
+        },
+        
+        leafletDrawEdited: function (layerIds) {
+            
+            for (var i = 0; i < layerIds.length; i++){
+                this.updateLayerJSONField(this.getLayerByPK(layerIds[i]))    
+            }
+        },
+        
+        updateLayerJSONField: function (layer) {
+            var layerToEdit = layer;
+            this.json_data = drawnItems.toGeoJSON();
+            console.log(this.json_data);
+            
+            // Filter only the features of this layer
+            function belongsTo(featureVal){
+                return featureVal.properties.ownerLayer == layerToEdit.pk;
+             }
+             this.json_data.features = this.json_data.features.filter(belongsTo);
+            
+            var _that = this;
+            // https://eventmapper-zkkmin.c9users.io/api/layers/12/
+            axios.patch('/api/layers/' + layerToEdit.pk + '/', 
+                        { json_data: this.json_data }, 
+                        {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}} 
+            )
+            .then(function(response){
+                console.log(response);
+                // _that.sortFeatures(response.data.json_data.features);
+                
+                // layerToEdit.features = [];
+                // response.data.json_data.features.forEach(function(obj){
+                //     if (obj.properties.ownerLayer == layerToEdit.pk){
+                //         layerToEdit.features.push(obj);     
+                //     }
+                    
+                // });
+                // // _that.layers.push(layerToEdit);
+                
+            })
+            .catch(function(error){
+                console.log(error)
+            });
+            
+        },
+        
         updateFeatureProperty: function () {
             // This function will update the properties value of
             // a feature in a layer
@@ -170,9 +222,13 @@ var maplayersApp = new Vue({
         
         onFeatureClicked: function (feature) {
             var _that = this;
-            map.eachLayer(function (l) {
-                if (l.feature != undefined) {
+            console.log(this.selectedLayer);
+            var layerClicked = this.layers[this.selectedLayer].pk;
+            console.log(layerClicked)
+            drawnItems.eachLayer(function (l) {
+                if (l.feature != undefined && l.feature.properties.ownerLayer == layerClicked) {
                     if (l.feature.id == feature.id) {
+                        
                         if (l.feature.properties.type !== 'marker'){
                             l.setStyle({ weight: '5', opacity: 0.5 }, 1);
                             
@@ -188,7 +244,7 @@ var maplayersApp = new Vue({
                         if (l.feature.properties.type !== 'marker') {
                             l.setStyle({ weight: '2', opacity: 0.7 }, 1);
                         }
-                        
+                        console.log(l.feature.properties.ownerLayer);
                     } // end check feature id
 
                 }
@@ -275,13 +331,13 @@ var maplayersApp = new Vue({
                 // setView
                 if (onFirstLoad && results.length > 0 && results[0].features.length > 0 ){
                     
-                    console.log(results[0].features[0].geometry.coordinates[0]);
+                    console.log(results[0].features[0].geometry.coordinates[0][0]);
                     var geometry = results[0].features[0].geometry;
                     var latlng = [];
                     // extract the very first point
-                    if (geometry.coordinates.constructor[0]===Array){
+                    if (geometry.coordinates[0].constructor===Array){
                     // non marker
-                        latlng = geometry.coordinates[0];
+                        latlng = geometry.coordinates[0][0];
                     }
                     else {
                     // marker
@@ -289,6 +345,7 @@ var maplayersApp = new Vue({
                     }
                     
                     // set map view
+                    console.log(latlng);
                     map.setView(L.latLng(latlng[1], latlng[0]), 19);
                     
                     // checked first layer

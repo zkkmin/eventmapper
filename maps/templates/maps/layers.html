@@ -221,6 +221,7 @@
     /* global $ */
     /* global maplayersApp */
     /* global L */
+    /* global Bloodhound */
     
     // typeahead
     
@@ -285,12 +286,6 @@
     map.addControl(drawControl);
     
     
-    /* to check whether the drawing just started
-    // if it is inital draw, map will zoom to the 
-    // drawing boundary for further detail drawing
-    */
-    var initialDraw = true;
-    
     map.on('draw:created', function(e){
       
       if (maplayersApp.layers.length == 0){
@@ -302,7 +297,21 @@
         $('#featureModal').modal('show');
       }
       
-     
+    }); // end draw:created
+    
+    map.on('draw:edited', function (e) {
+      var layers = e.layers;
+      // get owner unique ids
+      // update layers with those ids
+      var arrIds = [];
+      layers.eachLayer(function (layer) {
+        console.log(layer);
+        arrIds.push(layer.feature.properties.ownerLayer);
+        
+      });
+      console.log(arrIds);
+      console.log($.unique(arrIds));
+      maplayersApp.leafletDrawEdited($.unique(arrIds));
     });
     
     
