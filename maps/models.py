@@ -23,4 +23,9 @@ class Layer(models.Model):
     building_level = models.CharField(max_length=3)
     json_data = JSONField()
     eventmap = models.ForeignKey('EventMap', on_delete=models.CASCADE)
+    created = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        ordering = ('created',)
+    
 

@@ -59,12 +59,29 @@ var maplayersApp = new Vue({
     }, // computed
     
     mounted() {
-        this.getlayerlist(); 
-          
+        this.getlayerlist(true); 
+        
       
     },
     
     methods: {
+        hideFeature: function(l){
+            if (l.feature.properties.type === 'marker'){
+                l.setOpacity(0);
+            }
+            else{
+                l.setStyle({opacity: 0, fillOpacity: 0});
+            }
+        },
+        
+        showFeature: function(l){
+            if (l.feature.properties.type === 'marker'){
+                l.setOpacity(1);
+            }
+            else{
+                l.setStyle({opacity: 0.7, fillOpacity: 0.2});
+            }
+        },
         
         sortFeatures: function(arr){
             arr.sort(function (a, b){
@@ -169,7 +186,7 @@ var maplayersApp = new Vue({
             this.layerLvlError = '';
         },
         
-        getlayerlist: function(){
+        getlayerlist: function(onFirstLoad){
             var _that = this;
             axios.get('/api/eventmaps/' + this.mapPk + '/mlayers/')
             .then(function (response){
@@ -203,13 +220,25 @@ var maplayersApp = new Vue({
                             props.color = obj.properties.color;
                             props.type = obj.properties.type;
                             props.index = obj.properties.index;
-                            if (props.type !== "marker"){
-                                temp.setStyle({color: props.color, weight: 1, opacity: 0.7});    
+                            // if (props.type !== "marker"){
+                            //     temp.setIcon({opacity: 0, fillOpacity: 0}); 
+                            // }
+                            // else{
+                            //     temp.setOpacity(0);
+                            // }
+                            
+                            
+                            // if page is just loaded and 
+                            // the first layer is shown 
+                            if (onFirstLoad && i === 0){
+                                _that.showFeature(temp);
+                            }
+                            else{
+                                _that.hideFeature(temp);    
                             }
                             
                             drawnItems.addLayer(temp);
                             
-                            temp.setStyle({opacity: 0, fillOpacity: 0});
                             
                         });
                     }
@@ -218,6 +247,29 @@ var maplayersApp = new Vue({
                     
                     _that.layers.push(results[i]);
                     
+                }
+                
+                // setView
+                if (onFirstLoad && results.length > 0 && results[0].features.length > 0 ){
+                    
+                    console.log(results[0].features[0].geometry.coordinates[0]);
+                    var geometry = results[0].features[0].geometry;
+                    var latlng = [];
+                    // extract the very first point
+                    if (geometry.coordinates.constructor[0]===Array){
+                    // non marker
+                        latlng = geometry.coordinates[0]
+                    }
+                    else {
+                    // marker
+                        latlng = geometry.coordinates
+                    }
+                    
+                    // set map view
+                    map.setView(L.latLng(latlng[1], latlng[0]), 19);
+                    
+                    // checked first layer
+                    _that.layers[0].checked = true;
                 }
                 
             });
@@ -230,24 +282,27 @@ var maplayersApp = new Vue({
         
         checkboxChanged: function(layer, event){
             
+            var _that = this;
             if (layer.checked){
+                
                 //set opicity of to 0 of this group
                 drawnItems.eachLayer(function(l){
                  if(l.feature.properties.ownerLayer == layer.pk ){
-                     console.log(l);
-                     l.setStyle({opacity: 0.7, fillOpacity: 0.2});
-                     
+                     //console.log(l);
+                     // l.setStyle({opacity: 0.7, fillOpacity: 0.2});
+                     _that.showFeature(l);
                  } 
               }); 
 
             }
             else{
+                
                 //set opicity of to 0 of this group
                 drawnItems.eachLayer(function(l){
                  if(l.feature.properties.ownerLayer == layer.pk ){
                      console.log(l);
-                     l.setStyle({opacity: 0, fillOpacity: 0});
-                     
+                     // l.setStyle({opacity: 0, fillOpacity: 0});
+                     _that.hideFeature(l);
                  } 
               });  
             }
@@ -259,20 +314,20 @@ var maplayersApp = new Vue({
             console.log(alayer);
             var _that = this;
             axios.post('/api/layers/',
-                        { 'name': alayer.name, 'building_level': alayer.level, 'eventmap': '/api/eventmaps/' + _that.mapPk + '/', 'json_data': "{}" },
+                        { 'name': alayer.name, 'building_level': alayer.building_level, 'eventmap': '/api/eventmaps/' + _that.mapPk + '/', 'json_data': "{}" },
                         {headers: {"X-CSRFToken": Cookies.get('csrftoken'), 'X-Requested-With': 'XMLHttpRequest'}}
             )
             .then(function (response){
                // console.log(response); 
-            //   _that.layers.push({
-            //       name: response.data.name,
-            //       level: response.data.building_level,
-            //       checked: false,
-            //       features: [],
-            //       pk: response.data.pk
-            //   });
+              _that.layers.push({
+                  name: response.data.name,
+                  building_level: response.data.building_level,
+                  checked: false,
+                  features: [],
+                  pk: response.data.pk
+                });
             
-                _that.getlayerlist();
+                //_that.getlayerlist();
                 _that.clearFormData();
                 $('#layerModal').modal('hide');
                
