@@ -79,7 +79,7 @@ var maplayersApp = new Vue({
                 l.setOpacity(1);
             }
             else{
-                l.setStyle({opacity: 0.7, fillOpacity: 0.2});
+                l.setStyle({color: l.feature.properties.color, opacity: 0.7, fillOpacity: 0.2});
             }
         },
         
