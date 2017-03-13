@@ -220,12 +220,6 @@ var maplayersApp = new Vue({
                             props.color = obj.properties.color;
                             props.type = obj.properties.type;
                             props.index = obj.properties.index;
-                            // if (props.type !== "marker"){
-                            //     temp.setIcon({opacity: 0, fillOpacity: 0}); 
-                            // }
-                            // else{
-                            //     temp.setOpacity(0);
-                            // }
                             
                             
                             // if page is just loaded and 
@@ -258,11 +252,11 @@ var maplayersApp = new Vue({
                     // extract the very first point
                     if (geometry.coordinates.constructor[0]===Array){
                     // non marker
-                        latlng = geometry.coordinates[0]
+                        latlng = geometry.coordinates[0];
                     }
                     else {
                     // marker
-                        latlng = geometry.coordinates
+                        latlng = geometry.coordinates;
                     }
                     
                     // set map view

@@ -4,6 +4,8 @@
 /* global Qs */
 /* global $ */
 /* global drawnItems */
+/* global map */
+/* global L */
 
 var maplayersApp = new Vue({
     delimiters: ['${', '}'],
@@ -110,7 +112,7 @@ var maplayersApp = new Vue({
                         
                         results[i].json_data.features.forEach(function( obj) {
                             results[i].features.push(obj);
-                            console.log(obj);
+                            // console.log(obj);
                             var temp = L.GeoJSON.geometryToLayer(obj);
                             // console.log(temp);
                             
@@ -135,7 +137,10 @@ var maplayersApp = new Vue({
                             tempLayerGroup.addLayer(temp);
                         }); // end foreach
                         
-                        // tempLayerGroup.addTo(map);
+                        
+                        if(i === 0){
+                            tempLayerGroup.addTo(map);
+                        }
                         
                         
                     } // endif
@@ -143,11 +148,26 @@ var maplayersApp = new Vue({
                     results[i].checked = false;
                     results[i].layerGroup = tempLayerGroup || undefined;
                     _that.layers.push(results[i]);
+                
                     
+                } // end for loop
+                
+                // set view
+                if (results.length > 0 && results[0].features.length > 0){
+                    var geometry = results[0].features[0].geometry;
+                    var latlng = [];
+                    if (geometry.coordinates.constructor[0] === Array){
+                        latlng = geometry.coordinates[0];
+                    }
+                    else {
+                        latlng = geometry.coordinates;
+                    }
                     
+                    map.setView(L.latLng(latlng[1], latlng[0]), 19);
+                    _that.layers[0].checked = true;
                 }
                 
-            });
+            }); // end promise then
         },
         
         selectLayer: function(index, alayer){
