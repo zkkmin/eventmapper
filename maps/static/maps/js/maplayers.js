@@ -331,13 +331,13 @@ var maplayersApp = new Vue({
                 // setView
                 if (onFirstLoad && results.length > 0 && results[0].features.length > 0 ){
                     
-                    console.log(results[0].features[0].geometry.coordinates[0][0]);
+                    // console.log(results[0].features[0].geometry.coordinates[0]);
                     var geometry = results[0].features[0].geometry;
                     var latlng = [];
                     // extract the very first point
                     if (geometry.coordinates[0].constructor===Array){
                     // non marker
-                        latlng = geometry.coordinates[0][0];
+                        latlng = geometry.coordinates[0];
                     }
                     else {
                     // marker

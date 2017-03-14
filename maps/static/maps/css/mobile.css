@@ -1,5 +1,6 @@
 
-@media only screen and (max-width: 768px) {
+
+@media only screen  and (max-width: 768px) {
     /* For mobile */
     .mapDiv {
        height: 450px;
