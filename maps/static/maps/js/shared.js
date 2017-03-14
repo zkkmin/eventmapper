@@ -19,6 +19,7 @@ var maplayersApp = new Vue({
         layer: {},
         activeFeature: -1,
         activeLayer: -1,
+        panelVisible: false   // panel is hidden in mobile view intially
     },
     
     computed: {
@@ -61,11 +62,11 @@ var maplayersApp = new Vue({
                      // setView
                       
                      if (l.feature.properties.type === 'marker') {
-                        map.setView(l._latlng, 19);   
+                        map.setView(l._latlng, 17);   
                      }
                      else {
                          var middle = parseInt( l._latlngs.length / 2 );
-                         map.setView(l._latlngs[0], 19);
+                         map.setView(l._latlngs[0], 17);
                      }
                      
                  }
@@ -167,7 +168,7 @@ var maplayersApp = new Vue({
                         latlng = geometry.coordinates;
                     }
                     
-                    map.setView(L.latLng(latlng[1], latlng[0]), 19);
+                    map.setView(L.latLng(latlng[1], latlng[0]), 17);
                     _that.layers[0].checked = true;
                 }
                 
